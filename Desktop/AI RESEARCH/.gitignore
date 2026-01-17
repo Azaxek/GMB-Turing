@@ -1,3 +1,13 @@
+# LaTeX files (kept locally, not in repo)
+paper/
+*.tex
+*.bib
+*.cls
+*.bst
+sections/
+figures/
+figures_tiff/
+
 # LaTeX build files
 *.aux
 *.bbl
@@ -12,6 +22,7 @@
 *.toc
 *.lof
 *.lot
+*.pdf
 
 # Python
 __pycache__/
@@ -28,12 +39,8 @@ venv/
 .DS_Store
 Thumbs.db
 
-# Temporary
+# Other
 *.tmp
 *.bak
-
-# Large files (keep in LFS or exclude)
-# *.pdf
-
-# Data files (optional - uncomment if you want to exclude)
-# *.csv
+sn-template/
+sn-template.zip
