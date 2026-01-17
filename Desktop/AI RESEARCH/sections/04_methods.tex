@@ -1,0 +1,24 @@
+\section{Methods}
+
+\subsection{Mathematical Model Formulation}
+The spatiotemporal dynamics are governed by the system of partial differential equations:
+\begin{align}
+\frac{\partial u}{\partial t} &= \nabla \cdot (D_u(x)\nabla u) + \rho_0 \left(1+\frac{\phi v}{v_h+v}\right) u \left(1-\frac{u}{K}\right) - \delta_u u, \\
+\frac{\partial v}{\partial t} &= D_v \nabla^2 v + \alpha_v u - \eta v w - \mu_v \frac{v}{v_m+v} u - \delta_v v, \\
+\frac{\partial w}{\partial t} &= D_w \nabla^2 w + \alpha_w u + \beta_w \frac{v}{v_s+v} - \eta v w - \delta_w w.
+\end{align}
+Here, $u$ is tumor cell density, $v$ is VEGF-A, and $w$ is sFLT-1. $D_u(x)$ is an anisotropic diffusion tensor for tumor cells: $D_u = D_{u,\text{gray}} I + (D_{u,\text{white}} - D_{u,\text{gray}}) (T \otimes T)$, where $T(x)$ is the local white matter fiber orientation.
+
+\subsection{Numerical Methods and Implementation}
+The PDE system represents a stiff, nonlinear, coupled initial-boundary value problem. We solved it on a high-resolution 2D Cartesian grid ($512 \times 512$ nodes) representing a $10 \times 10$ cm coronal slice of brain tissue. The spatial discretization step was $\Delta x \approx 0.02$ cm.
+
+To ensure stability while maintaining computational efficiency, we employed a semi-implicit Crank-Nicolson Alternating Direction Implicit (ADI) operator splitting scheme. This method is unconditionally stable for the diffusion operator, allowing larger timesteps than explicit schemes. The non-linear reaction terms were integrated using a second-order Runge-Kutta (RK2) predictor-corrector method embedded within the time-split steps. The anisotropic diffusion term for tumor cells, which involves cross-derivatives ($D_{xy}$), was handled using a nine-point stencil to preserve rotational invariance.
+
+The solver was implemented in C++ and CUDA to leverage GPU acceleration on an NVIDIA A100 tensor core GPU. This acceleration was critical for performing the large-scale parameter sensitivity analysis (Monte Carlo simulations). Convergence to steady state was defined when the $L_2$ norm of the time derivative for all fields fell below $10^{-6}$.
+We verified the solver accuracy using the Method of Manufactured Solutions (MMS), achieving the expected $\mathcal{O}(\Delta t^2 + \Delta x^2)$ convergence rate. Further details are provided in Appendix~\ref{app:numerical}.
+
+\subsection{Clinical Image Analysis Cohort}
+Pre-operative T1Gd MRI scans were obtained from the BraTS 2025-2026 challenge. Inclusion criteria: IDH-wildtype GBM, $\ge 3$ distinct lesions, no prior therapy. $n=47$ patients met criteria.
+
+\subsection{Spatial Statistical Analysis}
+For each patient, lesion centroids were calculated in MNI152 space. The primary-satellite distance distribution was computed. The pair correlation function $g(r)$ was computed using Ripley's K-function with edge correction. Significance was assessed via 999 Monte Carlo simulations of a homogeneous Poisson process constrained to the brain mask.

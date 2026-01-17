@@ -1,0 +1,87 @@
+\appendix
+\section{Mathematical Appendix}
+
+\subsection{Linear Stability Analysis Derivation}
+\label{app:LSA}
+
+We consider the dimensionless reaction-diffusion system for the morphogens $v$ (activator, VEGF) and $w$ (inhibitor, sFLT-1), assuming the tumor density $u$ evolves on a much slower timescale and can be treated as quasistatic ($u \approx u_0$). The fast subsystem is given by:
+\begin{align}
+\frac{\partial v}{\partial t} &= \nabla^2 v + \gamma f(v,w), \\
+\frac{\partial w}{\partial t} &= d \nabla^2 w + \gamma g(v,w),
+\end{align}
+where $d = D_w/D_v$ is the diffusivity ratio and $\gamma$ is a scaling factor related to the domain size. The reaction kinetics are:
+\begin{align}
+f(v,w) &= \alpha_v u_0 - \eta v w - \delta_v v, \\
+g(v,w) &= \alpha_w u_0 + \beta_w \frac{v}{1+v} - \eta v w - \delta_w w.
+\end{align}
+(Note: forms are simplified for analytical tractability here).
+
+The homogeneous steady state $(v_*, w_*)$ is found by solving $f(v_*, w_*) = 0$ and $g(v_*, w_*) = 0$. We linearize around this state by introducing small perturbations:
+\begin{align}
+v(\mathbf{x}, t) &= v_* + \tilde{v} e^{\lambda t} e^{i \mathbf{k} \cdot \mathbf{x}}, \\
+w(\mathbf{x}, t) &= w_* + \tilde{w} e^{\lambda t} e^{i \mathbf{k} \cdot \mathbf{x}}.
+\end{align}
+Substituting these into the linearized system yields the Jacobian matrix $\mathbf{J}$:
+\begin{equation}
+\mathbf{J} = \begin{pmatrix} f_v & f_w \\ g_v & g_w \end{pmatrix}_{\!(v_*,w_*)}.
+\end{equation}
+The characteristic equation for the growth rate $\lambda$ is:
+\begin{equation}
+\det(\lambda \mathbf{I} - \mathbf{M}) = 0, \quad \text{where } \mathbf{M} = \gamma \mathbf{J} - k^2 \mathbf{D},
+\end{equation}
+and $\mathbf{D} = \text{diag}(1, d)$. This leads to the dispersion relation:
+\begin{equation}
+\lambda^2 - \text{Tr}(\mathbf{M})\lambda + \det(\mathbf{M}) = 0.
+\end{equation}
+For a Turing instability, we require the homogeneous state to be stable to uniform perturbations ($k=0$), which implies:
+\begin{align}
+\text{Tr}(\mathbf{J}) = f_v + g_w &< 0, \\
+\det(\mathbf{J}) = f_v g_w - f_w g_v &> 0.
+\end{align}
+Additionally, we require instability to spatial perturbations for some $k \neq 0$. This occurs when $\det(\mathbf{M}) < 0$ for some $k$, which leads to the critical condition:
+\begin{equation}
+d f_v + g_w > 2 \sqrt{d \det(\mathbf{J})}.
+\end{equation}
+Since $f_v + g_w < 0$, this implies $d \neq 1$. In fact, since we typically need an activator-inhibitor system where $f_v > 0$ and $g_w < 0$, we require $d > 1$ (specifically $d \gg 1$). The critical wavenumber $k_c$ is given by:
+\begin{equation}
+k_c^2 = \gamma \frac{d f_v + g_w}{2d}, \quad \text{or derived from } \det(\mathbf{M}_{min}) = 0.
+\end{equation}
+
+\subsection{Nondimensionalization}
+To facilitate numerical stability and analysis, we introduce the following dimensionless variables:
+\begin{equation}
+\tau = \delta_v t, \quad \mathbf{X} = \sqrt{\frac{\delta_v}{D_v}} \mathbf{x}, \quad V = \frac{v}{v_h}, \quad W = \frac{w}{w_{ref}}.
+\end{equation}
+Substituting these into the original PDEs eliminates several free parameters and groups the remaining ones into dimensionless groups (e.g., Damk{\"o}hler numbers). The resulting system is solved on the dimensionless domain $[0, L'] \times [0, L']$.
+
+\subsection{Numerical Implementation Details}
+\label{app:numerical}
+We employ a semi-implicit Crank-Nicolson Alternating Direction Implicit (ADI) method. The time-stepping scheme for the generic reaction-diffusion equation $u_t = D \nabla^2 u + R(u)$ is:
+\begin{align}
+\frac{u^{n+1/2} - u^n}{\Delta t/2} &= D \delta_x^2 u^{n+1/2} + D \delta_y^2 u^n + R(u^n), \\
+\frac{u^{n+1} - u^{n+1/2}}{\Delta t/2} &= D \delta_x^2 u^{n+1/2} + D \delta_y^2 u^{n+1} + R(u^{n+1/2}).
+\end{align}
+Here, $\delta_x^2$ and $\delta_y^2$ are the standard central difference operators. The nonlinear reaction terms are handled via a predictor-corrector approach using a second-order Runge-Kutta step to maintain $\mathcal{O}(\Delta t^2)$ accuracy.
+
+The anisotropic diffusion for the tumor cells:
+\begin{equation}
+\nabla \cdot (\mathbf{D}(\mathbf{x}) \nabla u)
+\end{equation}
+is discretized using a 9-point stencil to account for the cross-derivative terms ($D_{xy} \partial^2 u / \partial x \partial y$) introduced by the tensor rotation. The boundary conditions are zero-flux (Neumann) at the domain edges: $\mathbf{n} \cdot \nabla u = 0$.
+
+\subsection{Parameter Estimation}
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}llp{5cm}@{}}
+\toprule
+Param & Value & Justification \\ \midrule
+$D_v$ & $0.005$ mm$^2$/d & VEGF-A bound to ECM (slow) \\
+$D_w$ & $0.20$ mm$^2$/d & sFLT-1 soluble (fast) \\
+$K$ & $10^5$ cells/mm$^3$ & Tissue carrying capacity \\
+$\rho_0$ & $0.02$ d$^{-1}$ & GBM doubling time $\approx 30$ days \\
+$\eta$ & $1.0$ (scaled) & Mass action binding rate \\
+\bottomrule
+\end{tabular}
+\caption{Biophysical parameters used in the simulation.}
+\label{tab:params}
+\end{table}

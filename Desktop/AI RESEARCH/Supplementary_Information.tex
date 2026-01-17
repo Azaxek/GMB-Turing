@@ -1,0 +1,104 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage[left=2.5cm,right=2.5cm,top=2.5cm,bottom=2.5cm]{geometry}
+\usepackage{hyperref}
+
+\title{\Large\textbf{Supplementary Information} \\[0.5em] \normalsize A Turing Patterning Mechanism Deterministically Predicts the Spatiotemporal Geography of Glioblastoma Multifocal Recurrence}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\tableofcontents
+\newpage
+
+\section{Supplementary Note 1: Full Nondimensionalization}
+We introduce the following characteristic scales:
+\begin{align*}
+    x^* &= \sqrt{D_v / \delta_v}, & t^* &= 1/\delta_v, \\
+    u^* &= K, & v^* &= \alpha_v K / \delta_v, & w^* &= \alpha_w K / \delta_w.
+\end{align*}
+Substituting dimensionless variables $\tilde{x} = x/x^*$, $\tilde{t} = t/t^*$, $\tilde{u} = u/u^*$, etc., we obtain the dimensionless system:
+\begin{align}
+    \frac{\partial \tilde{u}}{\partial \tilde{t}} &= \tilde{D}_u \nabla^2 \tilde{u} + \tilde{\rho} (1 + \tilde{\phi} \tilde{v}) \tilde{u} (1 - \tilde{u}) - \tilde{\delta}_u \tilde{u}, \\
+    \frac{\partial \tilde{v}}{\partial \tilde{t}} &= \nabla^2 \tilde{v} + \tilde{u} - \tilde{\eta} \tilde{v} \tilde{w} - \tilde{v}, \\
+    \frac{\partial \tilde{w}}{\partial \tilde{t}} &= d \nabla^2 \tilde{w} + \tilde{\alpha}_w \tilde{u} + \tilde{\beta}_w \tilde{v} - \tilde{\eta} \tilde{v} \tilde{w} - \tilde{\delta}_w \tilde{w},
+\end{align}
+where $d = D_w/D_v$ is the critical diffusivity ratio.
+
+\section{Supplementary Note 2: Linear Stability Analysis Derivation}
+The Jacobian of the $(v, w)$ subsystem at steady state $(v_s, w_s)$, treating $u = u_s$, is:
+\begin{equation}
+    \mathbf{J} = \begin{pmatrix} J_{11} & J_{12} \\ J_{21} & J_{22} \end{pmatrix} = \begin{pmatrix} -\eta w_s - \delta_v & -\eta v_s \\ \beta_w / (1+v_s)^2 - \eta w_s & -\eta v_s - \delta_w \end{pmatrix}.
+\end{equation}
+The dispersion relation is:
+\begin{equation}
+    \det(\lambda \mathbf{I} - \mathbf{J} + k^2 \mathbf{D}) = 0,
+\end{equation}
+which expands to:
+\begin{equation}
+    \lambda^2 - \lambda \left[ \text{Tr}(\mathbf{J}) - k^2(1+d) \right] + \left[ \det(\mathbf{J}) - k^2(J_{11} d + J_{22}) + k^4 d \right] = 0.
+\end{equation}
+A Turing instability occurs when Re($\lambda$) $> 0$ for some $k \neq 0$, while Re($\lambda$) $< 0$ for $k = 0$. This requires:
+\begin{enumerate}
+    \item $\text{Tr}(\mathbf{J}) < 0$ (stability without diffusion).
+    \item $\det(\mathbf{J}) > 0$ (stability without diffusion).
+    \item $d J_{11} + J_{22} > 0$ (requires $d \gg 1$ if $J_{11} > 0$ and $J_{22} < 0$).
+    \item $(d J_{11} + J_{22})^2 > 4 d \det(\mathbf{J})$.
+\end{enumerate}
+The critical wavenumber $k_c$ is found by maximizing Re($\lambda(k)$):
+\begin{equation}
+    k_c^2 = \frac{d J_{11} + J_{22}}{2d}.
+\end{equation}
+
+\section{Supplementary Table 1: Model Parameters}
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Parameter} & \textbf{Symbol} & \textbf{Value} & \textbf{Source} \\ \midrule
+Tumor diffusion (grey) & $D_{u,\text{gray}}$ & $0.01$ mm$^2$/d & Swanson et al. (2000) \\
+Tumor diffusion (white) & $D_{u,\text{white}}$ & $0.1$ mm$^2$/d & Swanson et al. (2000) \\
+VEGF-A diffusion & $D_v$ & $3 \times 10^{-4}$ mm$^2$/d & Jain et al. (2007) \\
+sFLT-1 diffusion & $D_w$ & $0.012$ mm$^2$/d & Kendall \& Thomas (1993) \\
+Diffusivity ratio & $d = D_w/D_v$ & $\approx 40$ & Derived \\
+Proliferation rate & $\rho_0$ & $0.02$ d$^{-1}$ & Harpold et al. (2007) \\
+Carrying capacity & $K$ & $10^5$ cells/mm$^3$ & Estimated \\
+VEGF-A decay & $\delta_v$ & $0.1$ d$^{-1}$ & Ferrara et al. (2003) \\
+sFLT-1 decay & $\delta_w$ & $0.1$ d$^{-1}$ & Estimated \\
+Binding rate & $\eta$ & $1.0$ (scaled) & Mass action \\
+\bottomrule
+\end{tabular}
+\caption{Biophysical parameters used in the Turing model.}
+\end{table}
+
+\section{Supplementary Table 2: Patient Demographics}
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}ll@{}}
+\toprule
+\textbf{Characteristic} & \textbf{Value (n=47)} \\ \midrule
+Age, median (IQR) & 58 (49--67) years \\
+Sex, male (\%) & 28 (60\%) \\
+IDH status & All wildtype \\
+Number of lesions, median (range) & 4 (3--9) \\
+Primary lesion volume, median (IQR) & 32 (18--55) cm$^3$ \\
+Satellite lesion volume, median (IQR) & 2.1 (0.8--5.2) cm$^3$ \\
+\bottomrule
+\end{tabular}
+\caption{Demographic and clinical characteristics of the multifocal GBM cohort.}
+\end{table}
+
+\section{Supplementary Figure Legends}
+\textbf{Extended Data Fig. 1.} Dispersion relation $\lambda(k)$ for baseline parameters, showing the band of unstable wavenumbers.
+
+\textbf{Extended Data Fig. 2.} Global sensitivity analysis. First-order Sobol indices for model outputs (wavelength, saturation time, peak count) across 5,000 Latin Hypercube samples.
+
+\textbf{Extended Data Fig. 3.} 3D visualization of lesion centroids (MNI space) from the BraTS cohort, showing spatial distribution relative to ventricles and corpus callosum.
+
+\end{document}
